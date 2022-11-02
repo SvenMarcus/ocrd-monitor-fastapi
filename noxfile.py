@@ -5,7 +5,7 @@ import nox
 def mypy(session: nox.Session) -> None:
     session.install("-r", "requirements.txt")
     session.install("mypy")
-    session.run("mypy", "--non-interactive", "--install-types")
+    session.run("mypy", "--non-interactive", "--install-types", "ocrdbrowser", "ocrdmonitor")
     session.run("mypy", "--strict", "ocrdbrowser", "ocrdmonitor")
 
 

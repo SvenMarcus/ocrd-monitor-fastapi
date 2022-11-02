@@ -5,8 +5,7 @@ from shutil import which
 import os
 from typing import Optional
 
-from ocrdbrowser import OcrdBrowser
-
+from ._browser import OcrdBrowser
 from ._port import Port
 
 
@@ -43,16 +42,21 @@ class SubProcessOcrdBrowser:
         # broadwayd starts counting virtual X displays from port 8080 as :0
         displayport = str(localport - 8080)
         environment = dict(os.environ)
-        environment['GDK_BACKEND'] = 'broadway'
-        environment['BROADWAY_DISPLAY'] = ':' + displayport
+        environment["GDK_BACKEND"] = "broadway"
+        environment["BROADWAY_DISPLAY"] = ":" + displayport
 
         self._process = sp.Popen(
-            ' '.join([
-                "broadwayd", ":" + displayport + " &",
-                browse_ocrd, self._workspace + '/mets.xml ;',
-                "kill $!"
-            ]),
-            shell=True, env=environment
+            " ".join(
+                [
+                    "broadwayd",
+                    ":" + displayport + " &",
+                    browse_ocrd,
+                    self._workspace + "/mets.xml ;",
+                    "kill $!",
+                ]
+            ),
+            shell=True,
+            env=environment,
         )
 
     def stop(self) -> None:
