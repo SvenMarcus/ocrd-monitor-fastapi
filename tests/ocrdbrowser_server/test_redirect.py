@@ -44,6 +44,31 @@ def test__redirect_from_workspace__returns_server_address() -> None:
     assert sut.redirect_url(str(workspace)) == browser.address()
 
 
+def test__redirect_with_workspace__is_a_match() -> None:
+    workspace = Path("path/to/workspace")
+    browser = ServerStub("")
+    sut = WorkspaceRedirect(workspace, browser)
+
+    assert sut.matches(str(workspace)) is True
+
+
+def test__an_empty_path__does_not_match() -> None:
+    workspace = Path("path/to/workspace")
+    browser = ServerStub("")
+    sut = WorkspaceRedirect(workspace, browser)
+
+    assert sut.matches("") is False
+
+
+def test__a_path_starting_with_workspace__is_a_match() -> None:
+    workspace = Path("path/to/workspace")
+    browser = ServerStub("")
+    sut = WorkspaceRedirect(workspace, browser)
+
+    sub_path = workspace / "sub" / "path" / "file.txt"
+    assert sut.matches(str(sub_path)) is True
+
+
 def url(server_address: str, subpath: str) -> str:
     server_address = server_address.removesuffix("/")
     subpath = subpath.removeprefix("/")

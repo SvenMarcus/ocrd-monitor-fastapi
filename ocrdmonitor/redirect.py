@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import NoReturn, Protocol, TypeGuard
 
@@ -21,6 +22,9 @@ class WorkspaceRedirect:
         address = self._server.address().removesuffix("/")
         return (address + "/" + url).removesuffix("/")
 
+    def matches(self, path: str) -> bool:
+        return path.startswith(str(self.workspace))
+
 
 class RedirectMap:
     def __init__(self) -> None:
@@ -35,6 +39,7 @@ class RedirectMap:
         except KeyError:
             redirect = WorkspaceRedirect(workspace, server)
             self._redirects.setdefault(session_id, set()).add(redirect)
+            print(f"Adding redirect to {workspace}")
             return redirect
 
     def remove(self, session_id: str, workspace: Path) -> None:
@@ -42,11 +47,12 @@ class RedirectMap:
         self._redirects[session_id].remove(redirect)
 
     def get(self, session_id: str, workspace: Path) -> WorkspaceRedirect:
+        print("Getting redirect to", workspace)
         redirect = next(
             (
                 redirect
                 for redirect in self._redirects.get(session_id, set())
-                if redirect.workspace == workspace
+                if redirect.matches(str(workspace))
             ),
             None,
         )

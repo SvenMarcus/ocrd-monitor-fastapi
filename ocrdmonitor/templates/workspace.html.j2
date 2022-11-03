@@ -6,16 +6,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+
+    <style>
+        iframe {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
 </head>
 
 <body>
-    <ul>
-        {% for workspace in workspaces %}
-        <li>
-            <a href="/workspace/{{ workspace }}/">{{ workspace }}</a>
-        </li>
-        {% endfor %}
-    </ul>
+    <iframe src="/view/{{workspace}}" frameborder="0"></iframe>
 </body>
 
 </html>
