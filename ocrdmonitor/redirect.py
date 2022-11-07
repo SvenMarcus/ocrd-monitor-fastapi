@@ -1,6 +1,5 @@
-import logging
 from pathlib import Path
-from typing import NoReturn, Protocol, TypeGuard
+from typing import Protocol
 
 
 class WorkspaceServer(Protocol):

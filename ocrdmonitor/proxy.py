@@ -57,7 +57,6 @@ class WebSocketAdapter:
 
 def forward(redirect: WorkspaceRedirect, url: str) -> Response:
     redirect_url = redirect.redirect_url(url)
-    logging.info(f"Redirecting to {redirect_url}")
     response = request("GET", redirect_url, allow_redirects=False)
     return Response(
         content=response.content,
