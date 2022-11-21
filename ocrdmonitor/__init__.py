@@ -89,7 +89,6 @@ async def _(
 ) -> None:
     redirect = redirects.get(session_id, workspace)
     url = redirect.redirect_url(str(workspace / "socket"))
-    print("Connecting to browser", url)
     await websocket.accept(subprotocol="broadway")
 
     async with proxy.WebSocketAdapter(

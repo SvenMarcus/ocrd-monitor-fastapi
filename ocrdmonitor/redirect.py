@@ -38,7 +38,6 @@ class RedirectMap:
         except KeyError:
             redirect = WorkspaceRedirect(workspace, server)
             self._redirects.setdefault(session_id, set()).add(redirect)
-            print(f"Adding redirect to {workspace}")
             return redirect
 
     def remove(self, session_id: str, workspace: Path) -> None:
@@ -46,7 +45,6 @@ class RedirectMap:
         self._redirects[session_id].remove(redirect)
 
     def get(self, session_id: str, workspace: Path) -> WorkspaceRedirect:
-        print("Getting redirect to", workspace)
         redirect = next(
             (
                 redirect
