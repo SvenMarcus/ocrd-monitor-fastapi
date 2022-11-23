@@ -1,23 +1,35 @@
+from dataclasses import replace
 from pathlib import Path
 
-from ocrdmonitor.jobs import OcrdJob, KitodoProcessDetails
+from ocrdmonitor.ocrdjob import OcrdJob, KitodoProcessDetails
+
+JOB_DIR = Path("tests/ocrdbrowser_server/ocrd.jobs")
+JOB_TEMPLATE = OcrdJob(
+    kitodo_details=KitodoProcessDetails(
+        process_id=5432,
+        task_id=45989,
+        processdir="/data/5432",
+    ),
+    workdir="ocr-d/data/5432",
+    remotedir="/remote/job/dir",
+    workflow_file="ocr-workflow-default.sh",
+    controller_address="controller.ocrdhost.com",
+)
 
 
-def test__parsing_a_ocrd_job_file__returns_ocrdjob() -> None:
-    job_path = Path("tests/ocrdbrowser_server/ocrd.jobs/completed_job.env")
-    with job_path.open("r") as f:
-        content = f.read()
-        actual = OcrdJob.from_str(content)
+def test__parsing_a_ocrd_job_file_for_completed_job__returns_ocrdjob_with_a_return_code() -> None:
+    job_file = JOB_DIR / "completed_job.env"
+    content = job_file.read_text()
+    actual = OcrdJob.from_str(content)
 
-    assert actual == OcrdJob(
-        return_code=0,
-        kitodo_details=KitodoProcessDetails(
-            process_id=5432,
-            task_id=45989,
-            processdir="/data/5432",
-        ),
-        workdir="ocr-d/data/5432",
-        remotedir="/remote/job/dir",
-        workflow_file="ocr-workflow-default.sh",
-        controller_address="controller.ocrdhost.com",
-    )
+    expected = replace(JOB_TEMPLATE, return_code=0)
+    assert actual == expected
+
+
+def test__parsing_a_ocrd_job_file_for_running_job__returns_ocrdjob_with_a_process_id() -> None:
+    job_file = JOB_DIR / "running_job.env"
+    content = job_file.read_text()
+    actual = OcrdJob.from_str(content)
+
+    expected = replace(JOB_TEMPLATE, pid=1)
+    assert actual == expected
