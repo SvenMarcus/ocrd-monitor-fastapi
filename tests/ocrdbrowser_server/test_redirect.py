@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pytest
-from ocrdmonitor.redirect import WorkspaceRedirect
+from ocrdmonitor.server.redirect import WorkspaceRedirect
 
 
 class ServerStub:
