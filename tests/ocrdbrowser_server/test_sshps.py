@@ -18,8 +18,7 @@ def remove_existing_host_key() -> None:
     subprocess.run("ssh-keygen -R [localhost]:2222", shell=True, check=True)
 
 
-def configure_container() -> DockerContainer:
-    pub_key = Path(SSHSERVER_DIR) / "id.rsa.pub"
+def configure_container(pub_key: Path) -> DockerContainer:
     return (
         DockerContainer(image="lscr.io/linuxserver/openssh-server:latest")
         .with_bind_ports(2222, 2222)
@@ -29,11 +28,33 @@ def configure_container() -> DockerContainer:
 
 
 @pytest.fixture
-def openssh_server() -> Generator[DockerContainer, None, None]:
+def ssh_keys() -> Generator[tuple[Path, Path], None, None]:
+    keydir = Path(SSHSERVER_DIR)
+    keydir.mkdir(parents=True, exist_ok=True)
+    private_key = keydir / "id.rsa"
+    public_key = keydir / "id.rsa.pub"
+
+    subprocess.run(
+        f"ssh-keygen -t rsa -P '' -f {private_key.as_posix()}", shell=True, check=True
+    )
+
+    yield private_key, public_key
+
+    private_key.unlink()
+    public_key.unlink()
+
+
+@pytest.fixture
+def openssh_server(
+    ssh_keys: tuple[Path, Path]
+) -> Generator[DockerContainer, None, None]:
     remove_existing_host_key()
-    with configure_container() as container:
+    _, public_key = ssh_keys
+    with configure_container(public_key) as container:
         time.sleep(1)  # wait for ssh server to start
         yield container
+
+    remove_existing_host_key()
 
 
 def get_process_group_from_container(container: DockerContainer) -> int:
