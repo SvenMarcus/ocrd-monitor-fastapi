@@ -9,14 +9,15 @@ import ocrdbrowser
 import ocrdmonitor.server.proxy as proxy
 from ocrdbrowser import OcrdBrowser, workspace
 from ocrdmonitor.server.redirect import RedirectMap
-
-WORKSPACE_DIR = Path("ocrd_examples")
-BROWSER_FACTORY = ocrdbrowser.DockerOcrdBrowserFactory(
-    "http://localhost", set(range(9000, 9100))
-)
+from ocrdmonitor.server.settings import OcrdBrowserSettings
 
 
-def create_workspaces(templates: Jinja2Templates) -> APIRouter:
+def create_workspaces(
+    templates: Jinja2Templates, browser_settings: OcrdBrowserSettings
+) -> APIRouter:
+    _workspace_dir = browser_settings.workspace_dir
+    _factory = browser_settings.factory()
+
     router = APIRouter(prefix="/workspaces")
 
     running_browsers: set[OcrdBrowser] = set()
@@ -26,13 +27,11 @@ def create_workspaces(templates: Jinja2Templates) -> APIRouter:
     def list_workspaces(request: Request) -> Response:
         return templates.TemplateResponse(
             "list_workspaces.html.j2",
-            {"request": request, "workspaces": workspace.list_all(WORKSPACE_DIR)},
+            {"request": request, "workspaces": workspace.list_all(_workspace_dir)},
         )
 
     @router.get("/open/{workspace:path}", name="workspaces.open")
-    def open_workspace(
-        request: Request, workspace: str
-    ) -> Response:
+    def open_workspace(request: Request, workspace: str) -> Response:
         workspace_path = Path(workspace)
 
         session_id = request.cookies.setdefault("session_id", str(uuid.uuid4()))
@@ -41,7 +40,6 @@ def create_workspaces(templates: Jinja2Templates) -> APIRouter:
             {"request": request, "workspace": workspace},
         )
         response.set_cookie("session_id", session_id)
-
 
         browser = _launch_browser(session_id, workspace_path)
         redirects.add(session_id, workspace_path, browser)
@@ -77,7 +75,7 @@ def create_workspaces(templates: Jinja2Templates) -> APIRouter:
         browser = ocrdbrowser.launch(
             str(workspace).strip("/"),
             session_id,
-            BROWSER_FACTORY,
+            _factory,
             running_browsers,
         )
 

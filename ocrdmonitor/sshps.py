@@ -1,14 +1,15 @@
+from pathlib import Path
 import shlex
 import subprocess
-from typing import NamedTuple
+from typing import NamedTuple, Protocol
 from ocrdmonitor.processstatus import ProcessStatus, PS_CMD
 
 
-class SSHConfig(NamedTuple):
+class SSHConfig(Protocol):
     host: str
     port: int
     user: str
-    keyfile: str
+    keyfile: Path
 
 
 _SSH = (
@@ -16,7 +17,7 @@ _SSH = (
 )
 
 
-def status(config: SSHConfig, process_group: int) -> list[ProcessStatus]:
+def process_status(config: SSHConfig, process_group: int) -> list[ProcessStatus]:
     ssh_cmd = _build_ssh_command(config, process_group)
 
     result = subprocess.run(

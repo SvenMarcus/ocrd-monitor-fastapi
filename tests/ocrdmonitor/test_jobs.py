@@ -3,7 +3,7 @@ from pathlib import Path
 
 from ocrdmonitor.ocrdjob import OcrdJob, KitodoProcessDetails
 
-JOB_DIR = Path("tests/ocrdbrowser_server/ocrd.jobs")
+JOB_DIR = Path("tests/ocrdmonitor/ocrd.jobs")
 JOB_TEMPLATE = OcrdJob(
     kitodo_details=KitodoProcessDetails(
         process_id=5432,

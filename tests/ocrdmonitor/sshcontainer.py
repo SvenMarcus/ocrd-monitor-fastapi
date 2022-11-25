@@ -1,17 +1,23 @@
-import datetime
-from pathlib import Path
 import subprocess
 import time
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Generator
+
 import pytest
 from testcontainers.general import DockerContainer
-from ocrdmonitor.processstatus import ProcessState
 
-from ocrdmonitor.sshps import SSHConfig, status
-
-SSHSERVER_DIR = "tests/ocrdbrowser_server/testcontainers/sshserver"
+SSHSERVER_DIR = "tests/ocrdmonitor/server/testcontainers/sshserver"
 
 PS = "ps -o pid --no-headers"
+
+
+@dataclass
+class SSHConfig:
+    host: str
+    port: int
+    user: str
+    keyfile: Path
 
 
 def remove_existing_host_key() -> None:
@@ -25,6 +31,11 @@ def configure_container(pub_key: Path) -> DockerContainer:
         .with_env("PUBLIC_KEY", pub_key.read_text())
         .with_env("USER_NAME", "testcontainer")
     )
+
+
+def get_process_group_from_container(container: DockerContainer) -> int:
+    result = container.exec(PS)
+    return int(result.output.splitlines()[0].strip())
 
 
 @pytest.fixture
@@ -55,28 +66,3 @@ def openssh_server(
         yield container
 
     remove_existing_host_key()
-
-
-def get_process_group_from_container(container: DockerContainer) -> int:
-    result = container.exec(PS)
-    return int(result.output.splitlines()[0].strip())
-
-
-def test_ps_over_ssh__returns_list_of_process_status(
-    openssh_server: DockerContainer,
-) -> None:
-    process_group = get_process_group_from_container(openssh_server)
-
-    actual = status(
-        config=SSHConfig(
-            host="localhost",
-            port=2222,
-            user="testcontainer",
-            keyfile=str(Path(SSHSERVER_DIR).absolute() / "id.rsa"),
-        ),
-        process_group=process_group,
-    )
-
-    first_process = actual[0]
-    assert first_process.pid == process_group
-    assert first_process.state == ProcessState.SLEEPING

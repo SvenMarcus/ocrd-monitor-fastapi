@@ -3,6 +3,7 @@ import subprocess
 from dataclasses import dataclass
 from datetime import timedelta
 from enum import Enum
+from typing import cast
 
 PS_CMD = "ps -g {} -o pid,state,%cpu,rss,cputime --no-headers"
 
@@ -15,7 +16,7 @@ class ProcessState(Enum):
     UNKNOWN = "?"
 
     def __str__(self) -> str:
-        return self.name
+        return cast(str, self.name)
 
 
 @dataclass(frozen=True)
@@ -56,5 +57,5 @@ def run(group: int) -> list[ProcessStatus]:
 
 
 def _cpu_time_to_seconds(cpu_time: str) -> int:
-    hours, minutes, seconds, *_ = re.split(":|\.", cpu_time)
+    hours, minutes, seconds, *_ = cpu_time.split(":")
     return int(hours) * 3600 + int(minutes) * 60 + int(seconds)
