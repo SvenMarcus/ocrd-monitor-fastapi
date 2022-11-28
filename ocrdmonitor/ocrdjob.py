@@ -21,7 +21,9 @@ def _into_dict(content: str) -> dict[str, int | str]:
     result_dict = {}
     lines = content.splitlines()
     for line in lines:
-        key, value = line.split("=")
+        if not line:
+            continue
+        key, value = line.strip().split("=")
         if key not in _KEYMAP:
             continue
 

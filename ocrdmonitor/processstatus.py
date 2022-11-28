@@ -16,7 +16,7 @@ class ProcessState(Enum):
     UNKNOWN = "?"
 
     def __str__(self) -> str:
-        return cast(str, self.name)
+        return self.name
 
 
 @dataclass(frozen=True)
