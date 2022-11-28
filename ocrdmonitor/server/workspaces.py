@@ -7,16 +7,14 @@ from websockets.typing import Subprotocol
 
 import ocrdbrowser
 import ocrdmonitor.server.proxy as proxy
-from ocrdbrowser import OcrdBrowser, workspace
+from ocrdbrowser import OcrdBrowserFactory, OcrdBrowser, workspace
 from ocrdmonitor.server.redirect import RedirectMap
 from ocrdmonitor.server.settings import OcrdBrowserSettings
 
 
 def create_workspaces(
-    templates: Jinja2Templates, browser_settings: OcrdBrowserSettings
+    templates: Jinja2Templates, factory: OcrdBrowserFactory, workspace_dir: Path
 ) -> APIRouter:
-    _workspace_dir = browser_settings.workspace_dir
-    _factory = browser_settings.factory()
 
     router = APIRouter(prefix="/workspaces")
 
@@ -27,7 +25,7 @@ def create_workspaces(
     def list_workspaces(request: Request) -> Response:
         return templates.TemplateResponse(
             "list_workspaces.html.j2",
-            {"request": request, "workspaces": workspace.list_all(_workspace_dir)},
+            {"request": request, "workspaces": workspace.list_all(workspace_dir)},
         )
 
     @router.get("/open/{workspace:path}", name="workspaces.open")
@@ -75,7 +73,7 @@ def create_workspaces(
         browser = ocrdbrowser.launch(
             str(workspace).strip("/"),
             session_id,
-            _factory,
+            factory,
             running_browsers,
         )
 

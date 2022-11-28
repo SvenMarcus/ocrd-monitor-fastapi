@@ -1,7 +1,6 @@
 from pathlib import Path
-import shlex
 import subprocess
-from typing import NamedTuple, Protocol
+from typing import Protocol
 from ocrdmonitor.processstatus import ProcessStatus, PS_CMD
 
 

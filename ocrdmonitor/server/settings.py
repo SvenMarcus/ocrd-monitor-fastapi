@@ -1,3 +1,4 @@
+from functools import partial
 from pathlib import Path
 from typing import Literal
 
@@ -8,7 +9,8 @@ from ocrdbrowser import (
     OcrdBrowserFactory,
     SubProcessOcrdBrowserFactory,
 )
-from ocrdmonitor.sshps import SSHConfig
+from ocrdmonitor.server.jobs import ProcessQuery
+from ocrdmonitor.sshps import SSHConfig, process_status
 
 
 class OcrdControllerSettings(BaseModel):
@@ -17,6 +19,9 @@ class OcrdControllerSettings(BaseModel):
     user: str
     port: int = 22
     keyfile: Path = Path.home() / ".ssh" / "id_rsa"
+
+    def process_query(self) -> ProcessQuery:
+        return partial(process_status, config=self)
 
 
 class OcrdBrowserSettings(BaseModel):
