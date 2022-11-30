@@ -71,7 +71,7 @@ def create_workspaces(
 
     def _launch_browser(session_id: str, workspace: Path) -> OcrdBrowser:
         browser = ocrdbrowser.launch(
-            str(workspace).strip("/"),
+            str(workspace),
             session_id,
             factory,
             running_browsers,
