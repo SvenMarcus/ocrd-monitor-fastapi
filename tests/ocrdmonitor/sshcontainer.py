@@ -7,7 +7,7 @@ from typing import Generator
 import pytest
 from testcontainers.general import DockerContainer
 
-SSHSERVER_DIR = "tests/ocrdmonitor/server/testcontainers/sshserver"
+KEYDIR = Path("tests/ocrdmonitor/server/keys")
 
 PS = "ps -o pid --no-headers"
 
@@ -40,10 +40,9 @@ def get_process_group_from_container(container: DockerContainer) -> int:
 
 @pytest.fixture
 def ssh_keys() -> Generator[tuple[Path, Path], None, None]:
-    keydir = Path(SSHSERVER_DIR)
-    keydir.mkdir(parents=True, exist_ok=True)
-    private_key = keydir / "id.rsa"
-    public_key = keydir / "id.rsa.pub"
+    KEYDIR.mkdir(parents=True, exist_ok=True)
+    private_key = KEYDIR / "id.rsa"
+    public_key = KEYDIR / "id.rsa.pub"
 
     subprocess.run(
         f"ssh-keygen -t rsa -P '' -f {private_key.as_posix()}", shell=True, check=True

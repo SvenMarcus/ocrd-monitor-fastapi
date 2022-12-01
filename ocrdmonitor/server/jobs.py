@@ -27,7 +27,7 @@ def create_jobs(
 
     router = APIRouter(prefix="/jobs")
 
-    @router.get("/jobs", name="jobs")
+    @router.get("/", name="jobs")
     def jobs(request: Request) -> Response:
         job_files = job_dir.glob("*")
         jobs = [OcrdJob.from_str(job_file.read_text()) for job_file in job_files]

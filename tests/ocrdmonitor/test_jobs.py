@@ -23,11 +23,11 @@ JOB_TEMPLATE = OcrdJob(
     kitodo_details=KitodoProcessDetails(
         process_id=5432,
         task_id=45989,
-        processdir="/data/5432",
+        processdir=Path("/data/5432"),
     ),
-    workdir="ocr-d/data/5432",
+    workdir=Path("ocr-d/data/5432"),
+    workflow_file=Path("ocr-workflow-default.sh"),
     remotedir="/remote/job/dir",
-    workflow_file="ocr-workflow-default.sh",
     controller_address="controller.ocrdhost.com",
 )
 
@@ -36,10 +36,10 @@ def jobfile_content_for(job: OcrdJob) -> str:
     out = JOB_FILE_TEMPLATE.format(
         kitodo_process_id=job.kitodo_details.process_id,
         kitodo_task_id=job.kitodo_details.task_id,
-        kitodo_process_dir=job.kitodo_details.processdir,
-        workdir=job.workdir,
+        kitodo_process_dir=job.kitodo_details.processdir.as_posix(),
+        workdir=job.workdir.as_posix(),
+        workflow=job.workflow_file.as_posix(),
         remotedir=job.remotedir,
-        workflow=job.workflow_file,
         controller_address=job.controller_address,
     )
 

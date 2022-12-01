@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 def create_logs(templates: Jinja2Templates) -> APIRouter:
     router = APIRouter(prefix="/logs")
 
-    @router.get("/view", name="logs.view")
+    @router.get("/view/{path:path}", name="logs.view")
     def logs(request: Request, path: Path) -> Response:
         if not path.exists():
             return Response(status_code=404)

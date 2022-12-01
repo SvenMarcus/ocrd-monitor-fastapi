@@ -4,20 +4,20 @@ from pathlib import Path
 from typing import Any, NamedTuple, Type
 
 
-_KEYMAP: dict[str, tuple[Type[int] | Type[str], str]] = {
+_KEYMAP: dict[str, tuple[Type[int] | Type[str] | Type[Path], str]] = {
     "PID": (int, "pid"),
     "RETVAL": (int, "return_code"),
     "PROCESS_ID": (int, "process_id"),
     "TASK_ID": (int, "task_id"),
-    "PROCESS_DIR": (str, "processdir"),
-    "WORKDIR": (str, "workdir"),
+    "PROCESS_DIR": (Path, "processdir"),
+    "WORKDIR": (Path, "workdir"),
+    "WORKFLOW": (Path, "workflow_file"),
     "REMOTEDIR": (str, "remotedir"),
-    "WORKFLOW": (str, "workflow_file"),
     "CONTROLLER": (str, "controller_address"),
 }
 
 
-def _into_dict(content: str) -> dict[str, int | str]:
+def _into_dict(content: str) -> dict[str, int | str | Path]:
     result_dict = {}
     lines = content.splitlines()
     for line in lines:
@@ -36,7 +36,7 @@ def _into_dict(content: str) -> dict[str, int | str]:
 class KitodoProcessDetails(NamedTuple):
     process_id: int
     task_id: int
-    processdir: str
+    processdir: Path
 
 
 def _pop_kitodo_details(d: dict[str, Any]) -> dict[str, Any]:
@@ -50,9 +50,9 @@ def _pop_kitodo_details(d: dict[str, Any]) -> dict[str, Any]:
 @dataclass(frozen=True)
 class OcrdJob:
     kitodo_details: KitodoProcessDetails
-    workdir: str
+    workdir: Path
+    workflow_file: Path
     remotedir: str
-    workflow_file: str
     controller_address: str
 
     pid: int | None = None
