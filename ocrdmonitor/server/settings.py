@@ -1,3 +1,4 @@
+import atexit
 from functools import partial
 from pathlib import Path
 from typing import Literal
@@ -10,7 +11,7 @@ from ocrdbrowser import (
     SubProcessOcrdBrowserFactory,
 )
 from ocrdmonitor.server.jobs import ProcessQuery
-from ocrdmonitor.sshps import SSHConfig, process_status
+from ocrdmonitor.sshps import process_status
 
 
 class OcrdControllerSettings(BaseModel):
@@ -35,7 +36,9 @@ class OcrdBrowserSettings(BaseModel):
         if self.mode == "native":
             return SubProcessOcrdBrowserFactory(str(self.public_port), port_range_set)
         else:
-            return DockerOcrdBrowserFactory("http://localhost", port_range_set)
+            factory = DockerOcrdBrowserFactory("http://localhost", port_range_set)
+            atexit.register(factory.stop_all)
+            return factory
 
     @validator("port_range", pre=True)
     def validator(cls, value: str | tuple[int, int]) -> tuple[int, int]:
