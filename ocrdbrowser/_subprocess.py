@@ -23,7 +23,7 @@ class SubProcessOcrdBrowser:
         # (we use 8085 as fixed start of the internal port range,
         #  and map to the runtime corresponding external port)
         localport = self._localport.get()
-        return str(int(self._port) + localport - 8085)
+        return "http://localhost:" + str(int(self._port) + localport - 8085)
 
     def workspace(self) -> str:
         return self._workspace
