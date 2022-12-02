@@ -16,15 +16,15 @@ ENV_FILE = CURRENT_DIR / ".test.env"
 
 
 ENV_TEMPLATE = {
-    "browser_workspace_dir": "BROWSER__WORKSPACE_DIR={}",
-    "browser_mode": "BROWSER__MODE={}",
-    "browser_public_port": "BROWSER__PUBLIC_PORT={}",
-    "browser_port_range": "BROWSER__PORT_RANGE={}",
-    "controller_job_dir": "CONTROLLER__JOB_DIR={}",
-    "controller_host": "CONTROLLER__HOST={}",
-    "controller_user": "CONTROLLER__USER={}",
-    "controller_port": "CONTROLLER__PORT={}",
-    "controller_keyfile": "CONTROLLER__KEYFILE={}",
+    "browser_workspace_dir": "OCRD_BROWSER__WORKSPACE_DIR={}",
+    "browser_mode": "OCRD_BROWSER__MODE={}",
+    "browser_public_port": "OCRD_BROWSER__PUBLIC_PORT={}",
+    "browser_port_range": "OCRD_BROWSER__PORT_RANGE={}",
+    "controller_job_dir": "OCRD_CONTROLLER__JOB_DIR={}",
+    "controller_host": "OCRD_CONTROLLER__HOST={}",
+    "controller_user": "OCRD_CONTROLLER__USER={}",
+    "controller_port": "OCRD_CONTROLLER__PORT={}",
+    "controller_keyfile": "OCRD_CONTROLLER__KEYFILE={}",
 }
 
 
@@ -65,13 +65,13 @@ def test__can_parse_env_file() -> None:
     sut = Settings(_env_file=env_file)
 
     assert sut == Settings(
-        browser=OcrdBrowserSettings(
+        ocrd_browser=OcrdBrowserSettings(
             mode=env.browser_mode,
             workspace_dir=Path(env.browser_workspace_dir),
             public_port=int(env.browser_public_port),
             port_range=(9000, 9100),
         ),
-        controller=OcrdControllerSettings(
+        ocrd_controller=OcrdControllerSettings(
             job_dir=env.controller_job_dir,
             host=env.controller_host,
             user=env.controller_user,
@@ -96,5 +96,5 @@ def test__browser_settings__produces_matching_factory_for_selected_mode(
 
     sut = Settings(_env_file=env_file)
 
-    actual = sut.browser.factory()
+    actual = sut.ocrd_browser.factory()
     assert isinstance(actual, factory_type)

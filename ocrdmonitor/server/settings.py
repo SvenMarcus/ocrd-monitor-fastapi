@@ -55,8 +55,8 @@ class OcrdBrowserSettings(BaseModel):
 
 
 class Settings(BaseSettings):
-    browser: OcrdBrowserSettings
-    controller: OcrdControllerSettings
+    ocrd_browser: OcrdBrowserSettings
+    ocrd_controller: OcrdControllerSettings
 
     class Config:
         env_file: str = ".env"

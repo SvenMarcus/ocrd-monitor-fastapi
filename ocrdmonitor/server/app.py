@@ -36,15 +36,15 @@ def create_app(settings: Settings) -> FastAPI:
     app.include_router(
         create_jobs(
             templates,
-            settings.controller.process_query(),
-            settings.controller.job_dir,
+            settings.ocrd_controller.process_query(),
+            settings.ocrd_controller.job_dir,
         )
     )
     app.include_router(
         create_workspaces(
             templates,
-            settings.browser.factory(),
-            settings.browser.workspace_dir,
+            settings.ocrd_browser.factory(),
+            settings.ocrd_browser.workspace_dir,
         )
     )
     app.include_router(create_logs(templates))

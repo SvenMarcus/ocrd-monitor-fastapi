@@ -2,7 +2,6 @@ from dataclasses import replace
 from datetime import timedelta
 from pathlib import Path
 from typing import Generator
-from unittest.mock import patch
 
 import pytest
 from bs4 import BeautifulSoup
@@ -21,7 +20,6 @@ from ocrdmonitor.server.settings import (
 )
 from tests.ocrdmonitor.test_jobs import JOB_TEMPLATE, jobfile_content_for
 
-templates = Jinja2Templates(TEMPLATE_DIR)
 job_dir = Path(__file__).parent / "ocrd.jobs"
 
 
@@ -39,8 +37,8 @@ def prepare_and_clean_files() -> Generator[None, None, None]:
 
 def create_settings() -> Settings:
     return Settings(
-        browser=OcrdBrowserSettings(workspace_dir=Path(), port_range=(9000, 9100)),
-        controller=OcrdControllerSettings(job_dir=job_dir, host="", user=""),
+        ocrd_browser=OcrdBrowserSettings(workspace_dir=Path(), port_range=(9000, 9100)),
+        ocrd_controller=OcrdControllerSettings(job_dir=job_dir, host="", user=""),
     )
 
 
