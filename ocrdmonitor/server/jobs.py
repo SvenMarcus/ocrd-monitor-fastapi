@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import itertools
 from pathlib import Path
-from typing import Protocol
+from typing import Protocol, TypeGuard
 
 from fastapi import APIRouter, Request, Response
 from fastapi.templating import Jinja2Templates
@@ -27,10 +27,25 @@ class OcrdController:
         self._job_dir = job_dir
 
     def get_jobs(self) -> list[OcrdJob]:
-        return [
-            OcrdJob.from_str(job_file.read_text())
-            for job_file in self._job_dir.iterdir()
-        ]
+        def is_ocrd_job(j: OcrdJob | None) -> TypeGuard[OcrdJob]:
+            return j is not None
+
+        return list(
+            filter(
+                is_ocrd_job,
+                [
+                    self._try_parse(job_file.read_text())
+                    for job_file in self._job_dir.iterdir()
+                    if job_file.is_file()
+                ],
+            )
+        )
+
+    def _try_parse(self, job_str: str) -> OcrdJob | None:
+        try:
+            return OcrdJob.from_str(job_str)
+        except (ValueError, KeyError):
+            return None
 
     def status_for(self, ocrd_job: OcrdJob) -> ProcessStatus | None:
         if ocrd_job.pid is None:

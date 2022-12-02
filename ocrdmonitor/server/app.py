@@ -27,19 +27,10 @@ def create_app(settings: Settings) -> FastAPI:
     templates = Jinja2Templates(TEMPLATE_DIR)
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
-    # NOTE: 
-    # For some reason having this middleware causes an assertion error in the tests
-    #
-    # @app.middleware("http")
-    # async def swallow_exceptions(
-    #     request: Request, call_next: Callable[[Request], Awaitable[Response]]
-    # ) -> Response:
-    #     try:
-    #         response = await call_next(request)
-    #         return response
-    #     except Exception as err:
-    #         logging.error(err)
-    #         return RedirectResponse("/")
+    @app.exception_handler(Exception)
+    async def swallow_exceptions(request: Request, err: Exception) -> Response:
+        logging.error(err)
+        return RedirectResponse("/")
 
     app.include_router(create_index(templates))
     app.include_router(
